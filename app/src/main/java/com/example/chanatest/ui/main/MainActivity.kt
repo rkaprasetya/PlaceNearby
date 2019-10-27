@@ -22,11 +22,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.chanatest.R
 import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
 import java.util.*
 
 
-class MainActivity : AppCompatActivity(), MainContracts.view, View.OnClickListener{
+class MainActivity : AppCompatActivity(), MainContracts.view, View.OnClickListener {
 
     override var counter: Int = 0
     private var presenter = MainPresenterImpl(this)
@@ -54,17 +53,18 @@ class MainActivity : AppCompatActivity(), MainContracts.view, View.OnClickListen
         showCategory()
         hideProgressBar()
     }
+
     override fun onClick(v: View?) {
-        when(v!!.id){
+        when (v!!.id) {
             R.id.btn_refresh -> presenter.getSelfLocation()
         }
     }
 
-    private fun init(){
+    private fun init() {
         locationCallback = LocationCallback()
         rv_place.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         btn_refresh.setOnClickListener(this)
-       setSpinnerItemSelectedListener()
+        setSpinnerItemSelectedListener()
     }
 
     override fun showProgressBar() {
@@ -77,15 +77,15 @@ class MainActivity : AppCompatActivity(), MainContracts.view, View.OnClickListen
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 0){
+        if (requestCode == 0) {
             presenter.getSelfLocation()
-        }else if(requestCode == 1){
+        } else if (requestCode == 1) {
             checkGps()
         }
     }
 
-    private fun setSpinnerItemSelectedListener(){
-        spinner_main.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+    private fun setSpinnerItemSelectedListener() {
+        spinner_main.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
             }
@@ -97,13 +97,21 @@ class MainActivity : AppCompatActivity(), MainContracts.view, View.OnClickListen
                 id: Long
             ) {
                 val selection = parent?.getItemAtPosition(position)
-                    (parent?.getChildAt(0) as TextView).setTextColor(resources.getColor(R.color.white,null))
-                    getLastLocation { callback ->
-                        if(callback !=  null && counter!= 1)
-                            presenter.loadPlaceData(callback,selection.toString().toLowerCase(Locale.ENGLISH))
+                (parent?.getChildAt(0) as TextView).setTextColor(
+                    resources.getColor(
+                        R.color.white,
+                        null
+                    )
+                )
+                getLastLocation { callback ->
+                    if (callback != null && counter != 1)
+                        presenter.loadPlaceData(
+                            callback,
+                            selection.toString().toLowerCase(Locale.ENGLISH)
+                        )
 
-                        counter++
-                    }
+                    counter++
+                }
 
             }
 
@@ -112,14 +120,23 @@ class MainActivity : AppCompatActivity(), MainContracts.view, View.OnClickListen
 
 
     override fun checkPermissions(): Boolean {
-        val permissionState = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        val permissionState =
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
         return permissionState == PackageManager.PERMISSION_GRANTED
     }
+
     override fun requestPermission() {
         val shouldProvideRationale =
-            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
         if (shouldProvideRationale) {
-            showPopUp(resources.getString(R.string.permission_require),Settings.ACTION_APPLICATION_SETTINGS,0)
+            showPopUp(
+                resources.getString(R.string.permission_require),
+                Settings.ACTION_APPLICATION_SETTINGS,
+                0
+            )
         } else {
             startLocationPermissionRequest()
         }
@@ -129,21 +146,19 @@ class MainActivity : AppCompatActivity(), MainContracts.view, View.OnClickListen
      * Get last location. if there is no last location data in cache,
      * it will request location update
      */
-    override fun getLastLocation(callback: (Location?) ->Unit) {
-        var lastLoc : Location?
-        getFusedLocationClient()!!.lastLocation.addOnCompleteListener(this){
-                task ->
-            if(task?.result == null){
+    override fun getLastLocation(callback: (Location?) -> Unit) {
+        var lastLoc: Location?
+        getFusedLocationClient()!!.lastLocation.addOnCompleteListener(this) { task ->
+            if (task?.result == null) {
 
-                locationCallback = object : LocationCallback(){
+                locationCallback = object : LocationCallback() {
                     override fun onLocationResult(locationResult: LocationResult?) {
-                        if(locationResult != null && locationResult.locations.isNotEmpty())
-                        {
-                          val newLocation = locationResult.locations[0]
+                        if (locationResult != null && locationResult.locations.isNotEmpty()) {
+                            val newLocation = locationResult.locations[0]
                             callback.invoke(newLocation)
 
-                        }else{
-                         callback.invoke(null)
+                        } else {
+                            callback.invoke(null)
                             showToast(resources.getString(R.string.no_location))
                         }
                     }
@@ -151,8 +166,8 @@ class MainActivity : AppCompatActivity(), MainContracts.view, View.OnClickListen
 
                 val locationRequest = getLocationRequest()
 
-                fusedLocationClient?.requestLocationUpdates(locationRequest,locationCallback,null)
-            }else if (task.isSuccessful && task.result != null) {
+                fusedLocationClient?.requestLocationUpdates(locationRequest, locationCallback, null)
+            } else if (task.isSuccessful && task.result != null) {
                 lastLoc = task.result
                 callback.invoke(lastLoc)
             }
@@ -166,6 +181,7 @@ class MainActivity : AppCompatActivity(), MainContracts.view, View.OnClickListen
         interval = 10000
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
+
     private fun getFusedLocationClient(): FusedLocationProviderClient? {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         return fusedLocationClient
@@ -177,14 +193,16 @@ class MainActivity : AppCompatActivity(), MainContracts.view, View.OnClickListen
             REQUEST_PERMISSIONS_REQUEST_CODE
         )
     }
+
     override fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu,menu)
+        menuInflater.inflate(R.menu.menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
+
     private fun getSpinnerItem() = spinner_main.selectedItem.toString()
 
 
@@ -195,22 +213,27 @@ class MainActivity : AppCompatActivity(), MainContracts.view, View.OnClickListen
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
-           if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getLastLocation{callback ->
-                    if(callback != null)
-                    presenter.loadPlaceData(callback,getSpinnerItem())
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getLastLocation { callback ->
+                    if (callback != null)
+                        presenter.loadPlaceData(callback, getSpinnerItem())
                 }
             } else {
-                showPopUp(resources.getString(R.string.permission_require),Settings.ACTION_MANAGE_OVERLAY_PERMISSION,0)
+                showPopUp(
+                    resources.getString(R.string.permission_require),
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    0
+                )
             }
         }
     }
-    private fun showPopUp(message : String,mode : String, requestCode: Int){
+
+    private fun showPopUp(message: String, mode: String, requestCode: Int) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(resources.getString(R.string.warning))
         builder.setMessage(message)
         builder.setPositiveButton("Settings") { dialog, which ->
-            startActivityForResult( Intent(mode), requestCode)
+            startActivityForResult(Intent(mode), requestCode)
         }
         builder.setNegativeButton(android.R.string.cancel) { dialog, which ->
             finish()
@@ -223,19 +246,24 @@ class MainActivity : AppCompatActivity(), MainContracts.view, View.OnClickListen
      * Check if location service is enable or not.
      * If it is not enabled, it will prompt a popup that asks user to turn it on.
      */
-    override fun checkGps(){
+    override fun checkGps() {
         val isGpsEnable: Boolean
         val isNetworkEnable: Boolean
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         isGpsEnable = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         isNetworkEnable = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-        if(!isGpsEnable && !isNetworkEnable){
-            showPopUp(resources.getString(R.string.gps_service),Settings.ACTION_LOCATION_SOURCE_SETTINGS,1)
-        }else{
+        if (!isGpsEnable && !isNetworkEnable) {
+            showPopUp(
+                resources.getString(R.string.gps_service),
+                Settings.ACTION_LOCATION_SOURCE_SETTINGS,
+                1
+            )
+        } else {
             presenter.getSelfLocation()
         }
 
     }
+
     companion object {
         private val TAG = "LocationProvider"
         private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
