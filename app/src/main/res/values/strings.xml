@@ -1,0 +1,25 @@
+<resources>
+    <string name="api_key">AIzaSyCh6l-TyWv3b8vc5N2Le88Z0do8IfNTFuk</string>
+    <string name="app_name">ChanaTest</string>
+    <string name="list_of_place">List of place</string>
+    <string name="rating">Rating</string>
+    <string name="unavailable">Unavailable</string>
+    <string name="place_name">Place Name</string>
+    <string name="opening_hour">Unavailable</string>
+    <string name="distance">Distance</string>
+    <string name="gps_service">GPS service is needed to use this application. Please go to Settings to turn it on</string>
+    <string name="warning">Warning</string>
+    <string name="server_error">The data cannot be retrieved now. Please try again later.</string>
+    <string name="no_location">No location detected. Please make sure you have turned on your GPS</string>
+    <string name="category">Category</string>
+    <string name="settings">Settings</string>
+    <string name="server_error_message">Data cannot be retrieved right now. Please try again later</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="permission_require">Location permission is needed to use this app. Go to Settings to switch it on</string>
+    <string-array name="category">
+
+        <item value="restaurant">Restaurant</item>
+        <item value="cafe">Cafe</item>
+        <item value="bar">Bar</item>
+    </string-array>
+</resources>
